@@ -1,6 +1,6 @@
 import streamlit as st
-import pandas as pd
 import joblib
+import pandas as pd
 import matplotlib.pyplot as plt
 from wordcloud import WordCloud
 import numpy as np
@@ -11,6 +11,7 @@ MODEL_PATH = os.path.dirname(os.path.abspath(__file__))
 
 # Load trained models
 sentiment_model = joblib.load(os.path.join(MODEL_PATH, "naive_bayes_tuned_model.pkl"))
+tfidf_vectorizer = joblib.load(os.path.join(MODEL_PATH, "tfidf_vectorizer.pkl"))
 fake_review_model = joblib.load(os.path.join(MODEL_PATH, "fake_review_detection_model.pkl"))
 forecast_model = joblib.load(os.path.join(MODEL_PATH, "manual_arima_feedback_forecasting.pkl"))
 
@@ -48,7 +49,8 @@ if page == "Sentiment Analysis":
     st.subheader("Analyze customer feedback sentiment")
     user_input = st.text_area("Enter your feedback:")
     if st.button("Analyze Sentiment"):
-        prediction = sentiment_model.predict([user_input])
+        transformed_text = tfidf_vectorizer.transform([user_input])  # Apply TF-IDF transformation
+        prediction = sentiment_model.predict(transformed_text)
         st.subheader(f"Predicted Sentiment: {prediction[0]}")
         st.write(f"Debug: Raw Prediction Output → {prediction}")
         
