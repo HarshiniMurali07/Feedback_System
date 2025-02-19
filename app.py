@@ -5,10 +5,12 @@ import matplotlib.pyplot as plt
 from wordcloud import WordCloud
 import numpy as np
 
+MODEL_PATH = os.path.dirname(os.path.abspath(__file__))
+
 # Load trained models
-sentiment_model = joblib.load("sentiment_model.pkl")
-fake_review_model = joblib.load("fake_review_detection_model.pkl")
-forecast_model = joblib.load("manual_arima_feedback_forecasting.pkl")
+sentiment_model = joblib.load(os.path.join(MODEL_PATH, "naive_bayes_tuned_model.pkl"))
+fake_review_model = joblib.load(os.path.join(MODEL_PATH, "fake_review_detection_model.pkl"))
+forecast_model = joblib.load(os.path.join(MODEL_PATH, "manual_arima_feedback_forecasting.pkl"))
 
 # Sidebar Navigation
 st.sidebar.title("🔍 Feedback Management System")
