@@ -15,17 +15,18 @@ tfidf_vectorizer = joblib.load(os.path.join(MODEL_PATH, "tfidf_vectorizer.pkl"))
 fake_review_model = joblib.load(os.path.join(MODEL_PATH, "fake_review_detection_model.pkl"))
 forecast_model = joblib.load(os.path.join(MODEL_PATH, "manual_arima_feedback_forecasting.pkl"))
 
-# Custom CSS for better UI
+# Custom CSS for Modern UI
 def apply_custom_styles():
     st.markdown(
         """
         <style>
-        body {background-color: #f8f9fa; font-family: 'Arial', sans-serif;}
-        .main {background-color: #ffffff; padding: 30px; border-radius: 10px; box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.1);}
-        .stButton>button {background-color: #007bff; color: white; border-radius: 10px; padding: 10px 20px;}
-        .stTextArea>textarea {border-radius: 10px; border: 1px solid #007bff;}
-        .stSidebar {background-color: #2c3e50; color: white; padding: 20px;}
-        .header-text {color: #007bff; text-align: center; font-size: 28px; font-weight: bold;}
+        body {background-color: #e3f2fd; font-family: 'Arial', sans-serif;}
+        .main-container {background-color: #ffffff; padding: 20px; border-radius: 10px; box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);}
+        .stButton>button {background-color: #0288d1; color: white; border-radius: 10px; padding: 10px 20px; border: none;}
+        .stTextArea>textarea {border-radius: 10px; border: 1px solid #0288d1;}
+        .stSidebar {background-color: #1e3a56; color: white; padding: 20px;}
+        .header-text {color: #0288d1; text-align: center; font-size: 26px; font-weight: bold;}
+        .sub-header {color: #1565c0; text-align: center; font-size: 20px; font-weight: bold;}
         </style>
         """,
         unsafe_allow_html=True
