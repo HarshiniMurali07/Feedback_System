@@ -19,10 +19,12 @@ def apply_custom_styles():
     st.markdown(
         """
         <style>
-        body {background-color: #f0f2f6; font-family: 'Arial', sans-serif;}
-        .stButton>button {background-color: #4CAF50; color: white; border-radius: 10px; padding: 10px 20px;}
-        .stTextArea>textarea {border-radius: 10px;}
-        .stSidebar {background-color: #2e3b4e; color: white;}
+        body {background-color: #f8f9fa; font-family: 'Arial', sans-serif;}
+        .main {background-color: #ffffff; padding: 30px; border-radius: 10px; box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.1);}
+        .stButton>button {background-color: #007bff; color: white; border-radius: 10px; padding: 10px 20px;}
+        .stTextArea>textarea {border-radius: 10px; border: 1px solid #007bff;}
+        .stSidebar {background-color: #2c3e50; color: white; padding: 20px;}
+        .header-text {color: #007bff; text-align: center; font-size: 28px; font-weight: bold;}
         </style>
         """,
         unsafe_allow_html=True
@@ -30,10 +32,15 @@ def apply_custom_styles():
 
 apply_custom_styles()
 
+# Home Page
+st.markdown("<div class='header-text'>📝 Welcome to the Feedback Management System</div>", unsafe_allow_html=True)
+st.image("https://source.unsplash.com/800x300/?feedback,technology", use_column_width=True)
+st.write("This system allows you to analyze feedback using Sentiment Analysis, detect Fake Reviews, and predict future trends.")
+
 # Sidebar Navigation
-st.sidebar.title("🔍 Feedback Management System")
+st.sidebar.title("🔍 Navigation")
 st.sidebar.image("https://source.unsplash.com/400x200/?feedback", use_column_width=True)
-page = st.sidebar.radio("Go to", ["Sentiment Analysis", "Fake Review Detection", "Future Trend Prediction", "Download Reports"])
+page = st.sidebar.radio("Choose an Option", ["Home", "Sentiment Analysis", "Fake Review Detection", "Future Trend Prediction", "Download Reports"])
 
 # Sentiment Analysis Page
 if page == "Sentiment Analysis":
@@ -42,8 +49,8 @@ if page == "Sentiment Analysis":
     user_input = st.text_area("Enter your feedback:")
     if st.button("Analyze Sentiment"):
         prediction = sentiment_model.predict([user_input])
-        decoded_prediction = label_encoder.inverse_transform(prediction)
-        st.success(f"Predicted Sentiment: {decoded_prediction[0]}")
+        st.subheader(f"Predicted Sentiment: {prediction[0]}")
+        st.write(f"Debug: Raw Prediction Output → {prediction}")
         
         # Word Cloud Visualization
         wordcloud = WordCloud(width=800, height=400, background_color='white').generate(user_input)
@@ -57,7 +64,8 @@ elif page == "Fake Review Detection":
     if st.button("Check if Fake"):
         result = fake_review_model.predict([review_input])[0]
         confidence = np.max(fake_review_model.predict_proba([review_input]))
-        st.success(f"Predicted: {result} (Confidence: {confidence:.2f})")
+        st.subheader(f"Predicted: {result} (Confidence: {confidence:.2f})")
+        st.write(f"Debug: Raw Prediction Output → {result}")
 
 # Future Trend Prediction Page
 elif page == "Future Trend Prediction":
@@ -73,6 +81,7 @@ elif page == "Future Trend Prediction":
     ax.set_xlabel("Days")
     ax.set_ylabel("Avg Rating")
     st.pyplot(fig)
+    st.write(f"Debug: Forecast Output → {forecast}")
 
 # Download Reports Page
 elif page == "Download Reports":
