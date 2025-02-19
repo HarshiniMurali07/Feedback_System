@@ -1,94 +1,64 @@
 import streamlit as st
 import pandas as pd
-import random
-from datetime import datetime
-from textblob import TextBlob
+import joblib
+import matplotlib.pyplot as plt
+from wordcloud import WordCloud
+import numpy as np
 
-# Simulated feedback data
-feedback_data = []
+# Load trained models
+sentiment_model = joblib.load("sentiment_model.pkl")
+fake_review_model = joblib.load("fake_review_detection_model.pkl")
+forecast_model = joblib.load("manual_arima_feedback_forecasting.pkl")
 
-# User authentication system (Admin, Staff, Public Users)
-user_roles = {"admin": "admin123", "staff": "staff123"}
+# Sidebar Navigation
+st.sidebar.title("🔍 Feedback Management System")
+page = st.sidebar.radio("Go to", ["Sentiment Analysis", "Fake Review Detection", "Future Trend Prediction", "Download Reports"])
 
-def authenticate_user():
-    st.sidebar.title("Login")
-    username = st.sidebar.text_input("Username", "")
-    password = st.sidebar.text_input("Password", "", type="password")
-    if st.sidebar.button("Login"):
-        if username in user_roles and user_roles[username] == password:
-            return username
-        else:
-            st.sidebar.error("Invalid username or password")
-    return None
-
-def analyze_sentiment(feedback_text):
-    analysis = TextBlob(feedback_text)
-    polarity = analysis.sentiment.polarity
-    if polarity > 0:
-        return "Positive"
-    elif polarity < 0:
-        return "Negative"
-    else:
-        return "Neutral"
-
-def collect_feedback():
-    st.title("Patient Feedback Form")
-    name = st.text_input("Your Name")
-    department = st.selectbox("Department", ["Cardiology", "Neurology", "General Medicine", "Emergency", "Others"])
-    rating = st.slider("Rate your experience (1-5)", 1, 5, 3)
-    feedback_text = st.text_area("Additional Comments")
-    
-    if st.button("Submit Feedback"):
-        sentiment = analyze_sentiment(feedback_text)
-        feedback_entry = {
-            "name": name,
-            "department": department,
-            "rating": rating,
-            "feedback_text": feedback_text,
-            "sentiment": sentiment,
-            "date": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        }
-        feedback_data.append(feedback_entry)
-        st.success(f"Thank you for your feedback! Sentiment detected: {sentiment}")
+# Sentiment Analysis Page
+if page == "Sentiment Analysis":
+    st.title("📊 Sentiment Analysis")
+    user_input = st.text_area("Enter your feedback:")
+    if st.button("Analyze Sentiment"):
+        sentiment = sentiment_model.predict([user_input])[0]
+        st.subheader(f"Predicted Sentiment: {sentiment}")
         
-        if rating > 3:
-            st.markdown("[Click here to leave a Google Review](https://www.google.com)")
+        # Word Cloud Visualization
+        wordcloud = WordCloud(width=800, height=400, background_color='white').generate(user_input)
+        st.image(wordcloud.to_array(), use_column_width=True)
 
-def show_dashboard():
-    st.title("Admin & Staff Dashboard")
-    if not feedback_data:
-        st.warning("No feedback received yet.")
-        return
-    
-    df = pd.DataFrame(feedback_data)
-    st.write("### Feedback Summary")
-    st.dataframe(df)
-    
-    st.write("### Department-wise Feedback")
-    dept_counts = df["department"].value_counts()
-    st.bar_chart(dept_counts)
-    
-    st.write("### Rating Distribution")
-    rating_counts = df["rating"].value_counts()
-    st.bar_chart(rating_counts)
-    
-    st.write("### Sentiment Analysis")
-    sentiment_counts = df["sentiment"].value_counts()
-    st.bar_chart(sentiment_counts)
+# Fake Review Detection Page
+elif page == "Fake Review Detection":
+    st.title("🕵️‍♂️ Fake Review Detection")
+    review_input = st.text_area("Enter a review:")
+    if st.button("Check if Fake"):
+        result = fake_review_model.predict([review_input])[0]
+        confidence = np.max(fake_review_model.predict_proba([review_input]))
+        st.subheader(f"Predicted: {result} (Confidence: {confidence:.2f})")
 
-def main():
-    st.sidebar.title("Feedback Management System")
-    mode = st.sidebar.radio("Navigation", ["Submit Feedback", "Admin Dashboard"])
+# Future Trend Prediction Page
+elif page == "Future Trend Prediction":
+    st.title("📈 Future Trend Prediction")
+    num_days = st.slider("Select number of days to forecast:", 7, 30, 15)
+    forecast = forecast_model.forecast(steps=num_days)
     
-    logged_in_user = authenticate_user()
-    
-    if mode == "Submit Feedback":
-        collect_feedback()
-    elif mode == "Admin Dashboard":
-        if logged_in_user == "admin" or logged_in_user == "staff":
-            show_dashboard()
-        else:
-            st.warning("Admin or Staff login required to access the dashboard.")
+    # Plot Forecasting Results
+    fig, ax = plt.subplots()
+    ax.plot(range(num_days), forecast, marker='o', linestyle='dashed')
+    ax.set_title("Predicted Future Satisfaction Ratings")
+    ax.set_xlabel("Days")
+    ax.set_ylabel("Avg Rating")
+    st.pyplot(fig)
 
-if __name__ == "__main__":
-    main()
+# Download Reports Page
+elif page == "Download Reports":
+    st.title("📥 Download Reports")
+    st.write("Generate reports for sentiment analysis and trend forecasting.")
+    report_data = pd.DataFrame({
+        "Feedback": ["Great hospital", "Worst experience", "Friendly staff", "Long waiting time"],
+        "Sentiment": ["Positive", "Negative", "Positive", "Negative"]
+    })
+    st.dataframe(report_data)
+    csv = report_data.to_csv(index=False).encode('utf-8')
+    st.download_button("Download Report as CSV", csv, "report.csv", "text/csv")
+
+st.sidebar.info("Developed with ❤️ using Streamlit")
