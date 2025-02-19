@@ -4,7 +4,9 @@ import joblib
 import matplotlib.pyplot as plt
 from wordcloud import WordCloud
 import numpy as np
+import os
 
+# Ensure models are correctly located
 MODEL_PATH = os.path.dirname(os.path.abspath(__file__))
 
 # Load trained models
@@ -23,7 +25,7 @@ if page == "Sentiment Analysis":
     if st.button("Analyze Sentiment"):
         sentiment = sentiment_model.predict([user_input])[0]
         st.subheader(f"Predicted Sentiment: {sentiment}")
-        
+
         # Word Cloud Visualization
         wordcloud = WordCloud(width=800, height=400, background_color='white').generate(user_input)
         st.image(wordcloud.to_array(), use_column_width=True)
@@ -42,7 +44,7 @@ elif page == "Future Trend Prediction":
     st.title("📈 Future Trend Prediction")
     num_days = st.slider("Select number of days to forecast:", 7, 30, 15)
     forecast = forecast_model.forecast(steps=num_days)
-    
+
     # Plot Forecasting Results
     fig, ax = plt.subplots()
     ax.plot(range(num_days), forecast, marker='o', linestyle='dashed')
