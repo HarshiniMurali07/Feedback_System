@@ -13,7 +13,6 @@ MODEL_PATH = os.path.dirname(os.path.abspath(__file__))
 sentiment_model = joblib.load(os.path.join(MODEL_PATH, "naive_bayes_tuned_model.pkl"))
 fake_review_model = joblib.load(os.path.join(MODEL_PATH, "fake_review_detection_model.pkl"))
 forecast_model = joblib.load(os.path.join(MODEL_PATH, "manual_arima_feedback_forecasting.pkl"))
-label_encoder = joblib.load(os.path.join(MODEL_PATH, "label_encoder.pkl"))
 
 # Custom CSS for better UI
 def apply_custom_styles():
